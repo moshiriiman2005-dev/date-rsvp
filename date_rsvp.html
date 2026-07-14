@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Date RSVP 💌</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255,255,255,.75) 0 5%, transparent 6%),
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,.55) 0 4%, transparent 5%),
+        linear-gradient(135deg, #ffd6e7, #f8b4d9 50%, #d9c2ff);
+      color: #4a2145;
+    }
+
+    .card {
+      width: min(92vw, 560px);
+      padding: 38px 28px;
+      text-align: center;
+      border-radius: 28px;
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 22px 60px rgba(111, 52, 105, .22);
+      position: relative;
+      z-index: 2;
+    }
+
+    .emoji {
+      font-size: 60px;
+      animation: float 2.4s ease-in-out infinite;
+    }
+
+    h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(30px, 6vw, 48px);
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.55;
+      margin: 8px auto 26px;
+      max-width: 430px;
+    }
+
+    .details {
+      margin: 0 auto 28px;
+      padding: 16px;
+      max-width: 390px;
+      border-radius: 18px;
+      background: #fff4fa;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .buttons {
+      min-height: 120px;
+      position: relative;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease;
+      touch-action: manipulation;
+    }
+
+    #yesBtn {
+      background: linear-gradient(135deg, #ff4f91, #d947d7);
+      color: white;
+      box-shadow: 0 10px 24px rgba(220, 63, 153, .35);
+      margin-right: 12px;
+    }
+
+    #yesBtn:hover {
+      transform: translateY(-2px) scale(1.04);
+    }
+
+    #noBtn {
+      background: #ece7ef;
+      color: #6f5b70;
+      position: absolute;
+      left: 58%;
+      top: 0;
+      z-index: 5;
+    }
+
+    .success {
+      display: none;
+    }
+
+    .success h2 {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+
+    .heart {
+      position: fixed;
+      bottom: -30px;
+      font-size: 24px;
+      animation: rise linear forwards;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes rise {
+      to {
+        transform: translateY(-115vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .card { padding: 32px 20px; }
+      #yesBtn { margin-right: 0; }
+      .buttons { min-height: 150px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card" id="card">
+    <section id="invite">
+      <div class="emoji">💌</div>
+      <h1>Will you go on a date with me?</h1>
+      <p>
+        I promise good conversation, great food, and at least one moment
+        where we both pretend we are not nervous.
+      </p>
+
+      <div class="details">
+        📅 <strong>Date:</strong> Add your date here<br />
+        🕖 <strong>Time:</strong> Add your time here<br />
+        📍 <strong>Place:</strong> Add your location here
+      </div>
+
+      <div class="buttons" id="buttonArea">
+        <button id="yesBtn">Yes, absolutely 💖</button>
+        <button id="noBtn" aria-label="No">No</button>
+      </div>
+    </section>
+
+    <section class="success" id="success">
+      <div class="emoji">🥰</div>
+      <h2>It’s a date!</h2>
+      <p>
+        Excellent choice. I’ll send you the details — and I’m already looking
+        forward to seeing you.
+      </p>
+    </section>
+  </main>
+
+  <script>
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const invite = document.getElementById("invite");
+    const success = document.getElementById("success");
+
+    const noMessages = [
+      "No",
+      "Are you sure?",
+      "Wrong button 😏",
+      "Try again",
+      "Almost!",
+      "Nice try 😂"
+    ];
+
+    let moveCount = 0;
+
+    function moveNoButton() {
+      const buttonRect = noBtn.getBoundingClientRect();
+      const padding = 12;
+
+      const maxX = Math.max(padding, window.innerWidth - buttonRect.width - padding);
+      const maxY = Math.max(padding, window.innerHeight - buttonRect.height - padding);
+
+      const x = Math.random() * (maxX - padding) + padding;
+      const y = Math.random() * (maxY - padding) + padding;
+
+      noBtn.style.position = "fixed";
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top = `${y}px`;
+
+      moveCount++;
+      noBtn.textContent = noMessages[moveCount % noMessages.length];
+    }
+
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      moveNoButton();
+    });
+    noBtn.addEventListener("touchstart", (event) => {
+      event.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+    noBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      moveNoButton();
+    });
+
+    yesBtn.addEventListener("click", () => {
+      invite.style.display = "none";
+      success.style.display = "block";
+      noBtn.style.display = "none";
+      launchHearts();
+    });
+
+    function launchHearts() {
+      const hearts = ["💖", "💕", "💗", "💘", "🌸"];
+      for (let i = 0; i < 28; i++) {
+        setTimeout(() => {
+          const heart = document.createElement("div");
+          heart.className = "heart";
+          heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+          heart.style.left = `${Math.random() * 100}vw`;
+          heart.style.animationDuration = `${2.5 + Math.random() * 2.5}s`;
+          document.body.appendChild(heart);
+          setTimeout(() => heart.remove(), 5500);
+        }, i * 90);
+      }
+    }
+  </script>
+</body>
+</html>
